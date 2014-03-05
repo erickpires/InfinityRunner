@@ -2,6 +2,10 @@
 using System.Collections;
 using XInputDotNetPure;
 
+/* Xbox 360 controller wrapper
+* https://github.com/speps/XInputDotNet
+*/
+
 public class BehaviourScript : MonoBehaviour {
 
 	public float forwardSpeed;
@@ -10,7 +14,7 @@ public class BehaviourScript : MonoBehaviour {
 	public float sideSpeed;
 	
 	Vector3 movementVelocity = Vector3.zero;
-	bool jumping = false;
+	bool hasJumped = false;
 	bool onGround;
 	bool crouching;
 	// Use this for initialization
@@ -30,26 +34,34 @@ public class BehaviourScript : MonoBehaviour {
 		
 		movementVelocity = (transform.forward * Time.deltaTime * forwardSpeed);
 
-		if(Input.GetKey(KeyCode.LeftArrow) || state.ThumbSticks.Left.X == -1){
+		if(onGround && (Input.GetKey(KeyCode.LeftArrow) || state.ThumbSticks.Left.X == -1)){
 		  	movementVelocity -= Vector3.right * sideSpeed;
 		}
-		if(Input.GetKey(KeyCode.RightArrow) || state.ThumbSticks.Left.X == 1){
+		if(onGround && (Input.GetKey(KeyCode.RightArrow) || state.ThumbSticks.Left.X == 1)){
 			movementVelocity += Vector3.right * sideSpeed;
 		}
 
-		if (Input.GetKey (KeyCode.LeftControl) || state.Buttons.B == ButtonState.Pressed)
+		if (onGround && (Input.GetKey (KeyCode.LeftControl) || state.Buttons.B == ButtonState.Pressed))
 			crouching = true;
 		else
 			crouching = false;
 			
-		if (!jumping && (Input.GetKey (KeyCode.Space) || state.Buttons.A == ButtonState.Pressed)) {
-			jumping = true;
-				movementVelocity.y = Mathf.Sqrt(2 * jumpHeight * gravity);
+		if ((Input.GetKey (KeyCode.Space) || state.Buttons.A == ButtonState.Pressed) && !hasJumped) {
+			Debug.Log("jumped");
+			hasJumped = true;
+			movementVelocity.y = Mathf.Sqrt(2 * jumpHeight * gravity);
 		}
 
 
-		if (jumping && onGround && !Input.GetKey(KeyCode.Space) && state.Buttons.A == ButtonState.Released){
-			jumping = false;
+
+		if(crouching)
+			controller.height = 1;
+		else
+			controller.height = 2;
+
+
+		if (hasJumped && onGround && !Input.GetKey(KeyCode.Space) && state.Buttons.A == ButtonState.Released){
+			hasJumped = false;
 		}
 
 		Animate();
@@ -72,5 +84,9 @@ public class BehaviourScript : MonoBehaviour {
 			animation.Play("crouchRun");
 		else
 			animation.Play ("run");
+	}
+	
+	void OnTriggerEnter( Collider other){
+		Debug.Log("Collidiu com " + other);
 	}
 }
