@@ -12,15 +12,20 @@ public class BehaviourScript : MonoBehaviour {
 	public float gravity;
 	public float jumpHeight;
 	public float sideSpeed;
+	public GUIText counter;
 	
 	Vector3 movementVelocity = Vector3.zero;
 	bool hasJumped = false;
 	bool onGround;
 	bool crouching;
+	
+	float distance;
 	// Use this for initialization
 	void Start () {
 
 		animation.Play("run");
+		
+		distance = 0;
 		
 		
 	}
@@ -52,8 +57,6 @@ public class BehaviourScript : MonoBehaviour {
 			movementVelocity.y = Mathf.Sqrt(2 * jumpHeight * gravity);
 		}
 
-
-
 		if(crouching)
 			controller.height = 1;
 		else
@@ -69,6 +72,10 @@ public class BehaviourScript : MonoBehaviour {
 		ApplyGravity();
 		
 		controller.Move(movementVelocity * Time.deltaTime);
+		
+		distance += movementVelocity.z * Time.deltaTime;
+		
+		counter.text = string.Format( "Distancia percorrida: {0:0.0}", distance);
 	}
 	
 	void ApplyGravity(){
