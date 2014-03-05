@@ -18,14 +18,17 @@ public class BehaviourScript : MonoBehaviour {
 	bool hasJumped = false;
 	bool onGround;
 	bool crouching;
+	bool isAlive;
 	
 	float distance;
+	GameObject textObject = null;
 	// Use this for initialization
 	void Start () {
 
 		animation.Play("run");
 		
 		distance = 0;
+		isAlive = true;
 		
 		
 	}
@@ -37,6 +40,7 @@ public class BehaviourScript : MonoBehaviour {
 		GamePadState state = GamePad.GetState(0);
 		onGround = transform.position.y > 0.1 ? false : true;//controller.isGrounded;
 		
+		if(isAlive){
 		movementVelocity = (transform.forward * Time.deltaTime * forwardSpeed);
 
 		if(onGround && (Input.GetKey(KeyCode.LeftArrow) || state.ThumbSticks.Left.X == -1)){
@@ -75,7 +79,27 @@ public class BehaviourScript : MonoBehaviour {
 		
 		distance += movementVelocity.z * Time.deltaTime;
 		
-		counter.text = string.Format( "Distancia percorrida: {0:0.0}", distance);
+		counter.text = string.Format( "Distancia percorrida: {0:0.0} m", distance);
+		}
+		else{
+			if(textObject == null){
+			textObject = new GameObject("Game Over");
+			
+			textObject.transform.position = new Vector3(0.5f, 0.5f, 0);
+			textObject.AddComponent("GUIText");
+			textObject.guiText.text = "Game\n Over";
+			textObject.guiText.fontSize = 70;
+			textObject.guiText.anchor = TextAnchor.MiddleCenter;
+			textObject.guiText.color = Color.red;
+			}
+			//gameObject.SetActive(false);
+			animation.Play("idle");
+			
+			if(Input.GetKey (KeyCode.Return) || state.Buttons.Y == ButtonState.Pressed){
+				Debug.Log("reloaded");
+				Application.LoadLevel(Application.loadedLevel);
+			}
+		}
 	}
 	
 	void ApplyGravity(){
@@ -94,6 +118,7 @@ public class BehaviourScript : MonoBehaviour {
 	}
 	
 	void OnTriggerEnter( Collider other){
-		Debug.Log("Collidiu com " + other);
+		//Debug.Log("Collidiu com " + other);
+		isAlive = false;
 	}
 }
