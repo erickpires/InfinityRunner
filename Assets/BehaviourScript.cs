@@ -28,6 +28,7 @@ public class BehaviourScript : MonoBehaviour {
 	bool isAlive;
 	
 	float distance;
+	float speedVariation;
 	int gold;
 
 	// Use this for initialization
@@ -49,7 +50,7 @@ public class BehaviourScript : MonoBehaviour {
 		GamePadState state = GamePad.GetState(0);
 		
 		if(isAlive){
-			movementVelocity = (transform.forward * Time.deltaTime * forwardSpeed);
+			movementVelocity = (transform.forward * Time.deltaTime * (forwardSpeed + speedVariation));
 			
 			if(onGround && (Input.GetKey(KeyCode.LeftArrow) || state.ThumbSticks.Left.X == -1)){
 				movementVelocity -= Vector3.right * sideSpeed;
@@ -88,6 +89,8 @@ public class BehaviourScript : MonoBehaviour {
 			
 			ApplyGravity();
 			
+			AdjustSpeedVariation();
+			
 			controller.Move(movementVelocity * Time.deltaTime);
 			
 			distance += movementVelocity.z * Time.deltaTime;
@@ -105,9 +108,16 @@ public class BehaviourScript : MonoBehaviour {
 	}
 	
 	void ApplyGravity(){
-		if(!onGround)
-			movementVelocity.y -= gravity * Time.deltaTime;
+		movementVelocity.y -= gravity * Time.deltaTime;
 		
+	}
+
+	void AdjustSpeedVariation (){
+		
+		if(speedVariation > 0)
+			speedVariation -= 20;
+		if(speedVariation < 0)
+			speedVariation += 1;
 	}
 	
 	void Animate(){
@@ -132,6 +142,12 @@ public class BehaviourScript : MonoBehaviour {
 			Destroy(hit.gameObject);
 			goldText.text = "Ouro: " + gold;
 		}
+		
+		if(hit.gameObject.name == "Water")
+			speedVariation = 300;
+		
+		if(hit.gameObject.name == "Snow")
+			speedVariation = -100;
 	}
 	
 	void Die (){
