@@ -14,6 +14,8 @@ public class BehaviourScript : MonoBehaviour {
 	public float sideSpeed;
 	public float standingHeight;
 	public float crouchingHeight;
+	public float poisonedTime;
+	public Light lightSource;
 	
 	public Vector3 standingCenter;
 	public Vector3 crouchingCenter;
@@ -21,24 +23,28 @@ public class BehaviourScript : MonoBehaviour {
 	public GUIText score;
 	public GUIText goldText;
 	
-	Vector3 movementVelocity = Vector3.zero;
-	bool hasJumped = false;
+	Vector3 movementVelocity;
+	bool hasJumped;
 	bool onGround;
 	bool crouching;
 	bool isAlive;
+	bool poisoned;
 	
 	float distance;
 	float speedVariation;
+	float poisonTimeOut;
 	int gold;
 
 	// Use this for initialization
 	void Start () {
-		
-		animation.Play("run");
+		movementVelocity = Vector3.zero;
 		
 		distance = 0;
+		hasJumped = false;
 		isAlive = true;
+		poisoned = false;
 		
+		poisonTimeOut = 0;
 		gold = 0;
 		goldText.text = "Ouro: " + gold;
 	}
@@ -83,6 +89,17 @@ public class BehaviourScript : MonoBehaviour {
 			
 			if (hasJumped && onGround && !Input.GetKey(KeyCode.Space) && state.Buttons.A == ButtonState.Released){
 				hasJumped = false;
+			}
+			
+			if(poisoned){
+				poisonTimeOut -= Time.deltaTime;
+				if(poisonTimeOut <= 0){
+					poisoned = false;
+					poisonTimeOut = 0;
+					
+					lightSource.color = Color.white;
+					lightSource.intensity = 0.1f;
+				}
 			}
 			
 			Animate();
@@ -130,8 +147,8 @@ public class BehaviourScript : MonoBehaviour {
 	}
 	
 	void OnControllerColliderHit(ControllerColliderHit hit){
-		Debug.Log("collided with " + hit.gameObject);
-		if(hit.gameObject.name == "Barrier" || hit.collider.name == "Zombie")
+		//Debug.Log("collided with " + hit.gameObject);
+		if(hit.gameObject.tag == "Finish")
 			Die();
 			
 		if(hit.gameObject.name == "Ground")
@@ -148,6 +165,18 @@ public class BehaviourScript : MonoBehaviour {
 		
 		if(hit.gameObject.name == "Snow")
 			speedVariation = -100;
+			
+			
+	}
+	
+	void OnParticleCollision(GameObject other) {
+		if(!poisoned){
+			poisoned = true;
+			poisonTimeOut = poisonedTime;
+			
+			lightSource.color = Color.green;
+			lightSource.intensity = 8;
+		}
 	}
 	
 	void Die (){
