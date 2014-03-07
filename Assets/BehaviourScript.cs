@@ -154,22 +154,24 @@ public class BehaviourScript : MonoBehaviour {
 		if(hit.gameObject.name == "Ground")
 			onGround = true;
 			
-		if(hit.gameObject.name == "Gold Ignot"){
+		if(hit.gameObject.name.Contains("Gold Ignot")){
 			gold++;
 			Destroy(hit.gameObject);
 			goldText.text = "Ouro: " + gold;
 		}
 		
-		if(hit.gameObject.name == "Water")
+		if(hit.gameObject.name.Contains("Water"))
 			speedVariation = 300;
 		
-		if(hit.gameObject.name == "Snow")
+		if(hit.gameObject.name.Contains("Snow"))
 			speedVariation = -100;
 			
 			
 	}
 	
 	void OnParticleCollision(GameObject other) {
+		Debug.Log("collided with " + other);
+		
 		if(!poisoned){
 			poisoned = true;
 			poisonTimeOut = poisonedTime;

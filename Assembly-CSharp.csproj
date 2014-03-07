@@ -46,6 +46,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\BarriersScript.cs" />
      <Compile Include="Assets\BehaviourScript.cs" />
      <Compile Include="Assets\CameraBehaviourScript.cs" />
      <Compile Include="Assets\InfiniteTerrain.cs" />
