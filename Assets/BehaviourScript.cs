@@ -117,6 +117,9 @@ public class BehaviourScript : MonoBehaviour {
 		else{
 			animation.Play("idle");
 			
+			ApplyGravity();
+			controller.Move(movementVelocity * Time.deltaTime);
+			
 			if(Input.GetKey (KeyCode.Return) || state.Buttons.Y == ButtonState.Pressed){
 				Debug.Log("reloaded");
 				Application.LoadLevel(Application.loadedLevel);
@@ -148,9 +151,11 @@ public class BehaviourScript : MonoBehaviour {
 	
 	void OnControllerColliderHit(ControllerColliderHit hit){
 		//Debug.Log("collided with " + hit.gameObject);
-		if(hit.gameObject.tag == "Finish")
+		if(hit.gameObject.tag == "Finish"){
+			Debug.Log("Killed by " + hit.gameObject);
 			Die();
-			
+		}
+		
 		if(hit.gameObject.name == "Ground")
 			onGround = true;
 			
@@ -161,12 +166,13 @@ public class BehaviourScript : MonoBehaviour {
 		}
 		
 		if(hit.gameObject.name.Contains("Water"))
-			speedVariation = 300;
+			speedVariation = -100;
 		
 		if(hit.gameObject.name.Contains("Snow"))
-			speedVariation = -100;
-			
-			
+			speedVariation = -200;
+		
+		if(hit.gameObject.name.Contains("Oil"))
+			speedVariation = 300;
 	}
 	
 	void OnParticleCollision(GameObject other) {
@@ -207,6 +213,8 @@ public class BehaviourScript : MonoBehaviour {
 		}
 		
 		ShowGameOverText(record, newRecord);
+		
+		movementVelocity.x = movementVelocity.z = 0;
 		
 		isAlive = false;
 	}
