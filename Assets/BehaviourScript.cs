@@ -8,13 +8,17 @@ using XInputDotNetPure;
 
 public class BehaviourScript : MonoBehaviour {
 	
-	public float forwardSpeed;
+	public float standingSpeed;
+	public float crouchingSpeed;
 	public float gravity;
 	public float jumpHeight;
 	public float sideSpeed;
 	public float standingHeight;
 	public float crouchingHeight;
 	public float poisonedTime;
+	public float snowDrag;
+	public float waterDrag;
+	public float oilBoost;
 	public Light lightSource;
 	
 	public Vector3 standingCenter;
@@ -56,6 +60,12 @@ public class BehaviourScript : MonoBehaviour {
 		GamePadState state = GamePad.GetState(0);
 		
 		if(isAlive){
+			float forwardSpeed;
+			if(crouching)
+				forwardSpeed = crouchingSpeed;
+			else
+				forwardSpeed = standingSpeed;
+			
 			movementVelocity = (transform.forward * Time.deltaTime * (forwardSpeed + speedVariation));
 			
 			if(onGround && (Input.GetKey(KeyCode.LeftArrow) || state.ThumbSticks.Left.X == -1)){
@@ -166,13 +176,13 @@ public class BehaviourScript : MonoBehaviour {
 		}
 		
 		if(hit.gameObject.name.Contains("Water"))
-			speedVariation = -100;
+			speedVariation = -waterDrag;
 		
 		if(hit.gameObject.name.Contains("Snow"))
-			speedVariation = -200;
+			speedVariation = -snowDrag;
 		
 		if(hit.gameObject.name.Contains("Oil"))
-			speedVariation = 300;
+			speedVariation = oilBoost;
 	}
 	
 	void OnParticleCollision(GameObject other) {
