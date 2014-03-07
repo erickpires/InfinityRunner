@@ -8,7 +8,7 @@ public class WaterSimple : MonoBehaviour
 {
 	void Update()
 	{
-		if( !renderer )
+		/*if( !renderer )
 			return;
 		Material mat = renderer.sharedMaterial;
 		if( !mat )
@@ -27,6 +27,6 @@ public class WaterSimple : MonoBehaviour
 		mat.SetMatrix( "_WaveMatrix", scrollMatrix );
 				
 		scrollMatrix = Matrix4x4.TRS( new Vector3(offsetClamped.z,offsetClamped.w,0), Quaternion.identity, scale * 0.45f );
-		mat.SetMatrix( "_WaveMatrix2", scrollMatrix );
+		mat.SetMatrix( "_WaveMatrix2", scrollMatrix );*/
 	}
 }
