@@ -6,11 +6,14 @@ public class ZombieBehaviourScript : MonoBehaviour {
 	public float idleDistance;
 	public float speed;
 	
+	bool isNearPlayer;
+	
 	GameObject player;
 	
 	// Use this for initialization
 	void Start () {
 		rigidbody.freezeRotation = true;
+		isNearPlayer = false;
 		
 		player = GameObject.Find("Player");
 	}
@@ -25,6 +28,11 @@ public class ZombieBehaviourScript : MonoBehaviour {
 		if(playerDirection.magnitude < idleDistance){
 			rigidbody.velocity = playerDirection.normalized * speed;
 			transform.forward = playerDirection.normalized;
+			
+			if(!isNearPlayer){
+				isNearPlayer = true;
+				audio.enabled = true;
+			}
 		}
 		else
 			rigidbody.velocity = Vector3.zero;
