@@ -22,15 +22,19 @@ public class BarriersScript : MonoBehaviour {
 	GameObject fartherBarrier;
 	GameObject closestBarrier;
 	System.Random random = new System.Random();
+	//bool playerIsAlive;
 	
 	ArrayList barriersInGame = new ArrayList();
 	ArrayList floorObjectsInGame = new ArrayList();
 	ArrayList zombiesInGame = new ArrayList();
 	ArrayList goldInGame = new ArrayList();
 	ArrayList scenarioElementsInGame = new ArrayList();
-	// Use this for initialization
 	
+	// Use this for initialization
 	void Start () {
+		
+		Messenger.AddListener("player died", playerHasDied);
+		//playerIsAlive = true;
 		
 		for(int i = 0; i < maxBarriers; i++){
 			createBarrier();
@@ -40,51 +44,51 @@ public class BarriersScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if(isBehindPlayer(closestBarrier)){
-			barriersInGame.Remove(closestBarrier);
-			Destroy(closestBarrier);
-			
-			closestBarrier = barriersInGame[0] as GameObject;
-			
-			createBarrier();
-		}
-		
-		if(floorObjectsInGame.Count < maxFloorObjects)
-			if(random.NextDouble() < floorObjectProbability){
-				Vector3 pos = generateRandomPosition();	
-				if(canSpawn(pos))
-					createFloorObject(pos);
+			if(isBehindPlayer(closestBarrier)){
+				barriersInGame.Remove(closestBarrier);
+				Destroy(closestBarrier);
+				
+				closestBarrier = barriersInGame[0] as GameObject;
+				
+				createBarrier();
 			}
-		
-		if (zombiesInGame.Count < maxZombies)
-				if (random.NextDouble () < ZombieProbability) {
-						Vector3 pos = generateRandomPosition ();
-						if (canSpawn (pos))
-								createZombie (pos);
+			
+			if(floorObjectsInGame.Count < maxFloorObjects)
+				if(random.NextDouble() < floorObjectProbability){
+					Vector3 pos = generateRandomPosition();	
+					if(canSpawn(pos))
+						createFloorObject(pos);
 				}
 			
-		if(random.NextDouble() < goldProbability){
-			Vector3 pos = generateRandomPosition();
-			if(canSpawn(pos))
-				createGold(pos);
-		}
-		
-		if(random.NextDouble() < scenarioElementProbability){
-			int randomNumber = random.Next(0, scenarioElements.Length);
-			
-			if((scenarioElements[randomNumber] as GameObject).name.Contains("Door") || random.NextDouble() < 0.4){					
+			if (zombiesInGame.Count < maxZombies)
+					if (random.NextDouble () < ZombieProbability) {
+							Vector3 pos = generateRandomPosition ();
+							if (canSpawn (pos))
+									createZombie (pos);
+					}
+				
+			if(random.NextDouble() < goldProbability){
 				Vector3 pos = generateRandomPosition();
-				pos.x = (scenarioElements[randomNumber] as GameObject).transform.position.x;				
-			
 				if(canSpawn(pos))
-					createCenarioElement(pos, randomNumber);
+					createGold(pos);
 			}
-		}
-		
-		removeUnnecessary(floorObjectsInGame);
-		removeUnnecessary(zombiesInGame);
-		removeUnnecessary(goldInGame);
-		removeUnnecessary(scenarioElementsInGame);
+			
+			if(random.NextDouble() < scenarioElementProbability){
+				int randomNumber = random.Next(0, scenarioElements.Length);
+				
+				if((scenarioElements[randomNumber] as GameObject).name.Contains("Door") || random.NextDouble() < 0.4){					
+					Vector3 pos = generateRandomPosition();
+					pos.x = (scenarioElements[randomNumber] as GameObject).transform.position.x;				
+				
+					if(canSpawn(pos))
+						createCenarioElement(pos, randomNumber);
+				}
+			}
+			
+			removeUnnecessary(floorObjectsInGame);
+			removeUnnecessary(zombiesInGame);
+			removeUnnecessary(goldInGame);
+			removeUnnecessary(scenarioElementsInGame);
 	}
 
 	bool isBehindPlayer (GameObject o){
@@ -192,5 +196,13 @@ public class BarriersScript : MonoBehaviour {
 				Destroy(listObject);
 			}
 		}
+	}
+	
+	void playerHasDied(){
+		Debug.Log("Dead Messege received");
+		
+		Messenger.Cleanup();
+		gameObject.SetActive(false);
+		//playerIsAlive = false;
 	}
 }

@@ -220,12 +220,18 @@ public class BehaviourScript : MonoBehaviour {
 			
 			lightSource.color = Color.green;
 			lightSource.intensity = 8;
+			
+			Debug.Log("messege broadcasted");
+			
+			Messenger.Broadcast("player poisoned");
 		}
 	}
 	
 	void Die (){
 		float record = 0;
 		bool newRecord = false;
+		
+		Messenger.Broadcast("player died");
 		
 		if(System.IO.File.Exists("record.dat")){
 			Debug.Log("record exists");

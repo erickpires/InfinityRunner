@@ -48,8 +48,10 @@
   <ItemGroup>
      <Compile Include="Assets\BarriersScript.cs" />
      <Compile Include="Assets\BehaviourScript.cs" />
+     <Compile Include="Assets\Callback.cs" />
      <Compile Include="Assets\CameraBehaviourScript.cs" />
      <Compile Include="Assets\InfiniteTerrain.cs" />
+     <Compile Include="Assets\Messenger.cs" />
      <Compile Include="Assets\NewBehaviourScript.cs" />
      <Compile Include="Assets\Properties\AssemblyInfo.cs" />
      <Compile Include="Assets\RainFX\RainCreator.cs" />

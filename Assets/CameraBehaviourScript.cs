@@ -8,7 +8,7 @@ public class CameraBehaviourScript : MonoBehaviour {
 	public float cameraHeight;
 	// Use this for initialization
 	void Start () {
-	
+		Messenger.AddListener("player poisoned", playerGotPoisoned);
 	}
 	
 	// Update is called once per frame
@@ -20,5 +20,9 @@ public class CameraBehaviourScript : MonoBehaviour {
 		transform.position = pos;
 		
 		transform.forward = player.transform.position - pos;
+	}
+	
+	void playerGotPoisoned(){
+		Debug.Log("Messege received");
 	}
 }
