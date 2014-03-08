@@ -19,6 +19,7 @@ public class BehaviourScript : MonoBehaviour {
 	public float snowDrag;
 	public float waterDrag;
 	public float oilBoost;
+	public float goldBoost;
 	public Light lightSource;
 	
 	public Vector3 standingCenter;
@@ -33,6 +34,7 @@ public class BehaviourScript : MonoBehaviour {
 	bool crouching;
 	bool isAlive;
 	bool poisoned;
+	bool canUseBoost;
 	
 	float distance;
 	float speedVariation;
@@ -50,7 +52,8 @@ public class BehaviourScript : MonoBehaviour {
 		
 		poisonTimeOut = 0;
 		gold = 0;
-		goldText.text = "Ouro: " + gold;
+		UpdateGoldText();
+		
 	}
 	
 	// Update is called once per frame
@@ -68,24 +71,48 @@ public class BehaviourScript : MonoBehaviour {
 			
 			movementVelocity = (transform.forward * Time.deltaTime * (forwardSpeed + speedVariation));
 			
-			if(onGround && (Input.GetKey(KeyCode.LeftArrow) || state.ThumbSticks.Left.X == -1)){
-				movementVelocity -= Vector3.right * sideSpeed;
-			}
-			if(onGround && (Input.GetKey(KeyCode.RightArrow) || state.ThumbSticks.Left.X == 1)){
-				movementVelocity += Vector3.right * sideSpeed;
-			}
 			
-			if (onGround && (Input.GetKey (KeyCode.LeftControl) || state.Buttons.B == ButtonState.Pressed))
-				crouching = true;
+			//Input read section
+			if(Input.GetKey(KeyCode.LeftArrow) || state.ThumbSticks.Left.X == -1)
+				if(onGround)
+					movementVelocity += Vector3.left * sideSpeed;
+			
+			if(Input.GetKey(KeyCode.RightArrow) || state.ThumbSticks.Left.X == 1)
+				if(onGround)
+					movementVelocity += Vector3.right * sideSpeed;
+			
+			if (Input.GetKey (KeyCode.LeftControl) || state.Buttons.B == ButtonState.Pressed){
+				if(onGround)
+					crouching = true;
+			}
 			else
 				crouching = false;
 			
-			if ((Input.GetKey (KeyCode.Space) || state.Buttons.A == ButtonState.Pressed) && !hasJumped) {
-				Debug.Log("jumped");
-				hasJumped = true;
-				onGround = false;
-				movementVelocity.y = Mathf.Sqrt(2 * jumpHeight * gravity);
+			if (Input.GetKey (KeyCode.Space) || state.Buttons.A == ButtonState.Pressed)
+				if(!hasJumped) {
+					Debug.Log("jumped");
+					hasJumped = true;
+					onGround = false;
+					movementVelocity.y = Mathf.Sqrt(2 * jumpHeight * gravity);
 			}
+			
+			if(Input.GetKey(KeyCode.LeftShift) || state.Buttons.X == ButtonState.Pressed){
+				if(canUseBoost && onGround && gold > 0){
+					canUseBoost = false;
+					gold--;
+					UpdateGoldText();
+					
+					speedVariation += goldBoost;
+				}
+			}
+			
+			//Wish we had a KeyDown for the ControllerButton
+			if (hasJumped && onGround && !Input.GetKey(KeyCode.Space) && state.Buttons.A == ButtonState.Released){
+				hasJumped = false;
+			}
+			
+			if(!canUseBoost && !Input.GetKey(KeyCode.LeftShift) && state.Buttons.X == ButtonState.Released)
+				canUseBoost = true;
 			
 			if(crouching){
 				controller.height = crouchingHeight;
@@ -97,9 +124,7 @@ public class BehaviourScript : MonoBehaviour {
 			}
 			
 			
-			if (hasJumped && onGround && !Input.GetKey(KeyCode.Space) && state.Buttons.A == ButtonState.Released){
-				hasJumped = false;
-			}
+			
 			
 			if(poisoned){
 				poisonTimeOut -= Time.deltaTime;
@@ -172,6 +197,7 @@ public class BehaviourScript : MonoBehaviour {
 		if(hit.gameObject.name.Contains("Gold Ignot")){
 			gold++;
 			Destroy(hit.gameObject);
+			UpdateGoldText();
 			goldText.text = "Ouro: " + gold;
 		}
 		
@@ -253,5 +279,9 @@ public class BehaviourScript : MonoBehaviour {
 		textObject2.guiText.alignment = TextAlignment.Center;
 		textObject2.guiText.color = Color.grey;
 		textObject2.guiText.text = text;
+	}
+
+	void UpdateGoldText (){
+		goldText.text = "Ouro: " + gold;
 	}
 }

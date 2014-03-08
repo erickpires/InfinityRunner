@@ -72,7 +72,7 @@ public class BarriersScript : MonoBehaviour {
 		if(random.NextDouble() < scenarioElementProbability){
 			int randomNumber = random.Next(0, scenarioElements.Length);
 			
-			if((scenarioElements[randomNumber] as GameObject).name.Contains("Door") || random.NextDouble() < 0.8){					
+			if((scenarioElements[randomNumber] as GameObject).name.Contains("Door") || random.NextDouble() < 0.4){					
 				Vector3 pos = generateRandomPosition();
 				pos.x = (scenarioElements[randomNumber] as GameObject).transform.position.x;				
 			
