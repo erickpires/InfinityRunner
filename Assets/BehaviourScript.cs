@@ -161,7 +161,7 @@ public class BehaviourScript : MonoBehaviour {
 	
 	void OnControllerColliderHit(ControllerColliderHit hit){
 		//Debug.Log("collided with " + hit.gameObject);
-		if(hit.gameObject.tag == "Finish"){
+		if(hit.gameObject.tag == "Finish" && isAlive){
 			Debug.Log("Killed by " + hit.gameObject);
 			Die();
 		}
