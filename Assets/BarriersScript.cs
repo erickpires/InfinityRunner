@@ -5,6 +5,7 @@ public class BarriersScript : MonoBehaviour {
 	
 	public GameObject[] barriers;
 	public GameObject[] floorObjects;
+	public GameObject[] scenarioElements;
 	public GameObject player;
 	public GameObject zombie;
 	public GameObject gold;
@@ -12,6 +13,11 @@ public class BarriersScript : MonoBehaviour {
 	public int maxBarriers;
 	public int maxFloorObjects;
 	public int maxZombies;
+
+	public double floorObjectProbability;
+	public double ZombieProbability;
+	public double goldProbability;
+	public double scenarioElementProbability;
 	
 	GameObject fartherBarrier;
 	GameObject closestBarrier;
@@ -21,6 +27,7 @@ public class BarriersScript : MonoBehaviour {
 	ArrayList floorObjectsInGame = new ArrayList();
 	ArrayList zombiesInGame = new ArrayList();
 	ArrayList goldInGame = new ArrayList();
+	ArrayList scenarioElementsInGame = new ArrayList();
 	// Use this for initialization
 	
 	void Start () {
@@ -43,28 +50,37 @@ public class BarriersScript : MonoBehaviour {
 		}
 		
 		if(floorObjectsInGame.Count < maxFloorObjects)
-			if(random.NextDouble() < 0.01){
+			if(random.NextDouble() < floorObjectProbability){
 				Vector3 pos = generateRandomPosition();	
 				if(canSpawn(pos))
 					createFloorObject(pos);
 			}
 		
-		if(zombiesInGame.Count < maxZombies)
-			if(random.NextDouble() < 0.02){
-				Vector3 pos = generateRandomPosition();
-				if(canSpawn(pos))
-					createZombie(pos);
-			}
+		if (zombiesInGame.Count < maxZombies)
+				if (random.NextDouble () < ZombieProbability) {
+						Vector3 pos = generateRandomPosition ();
+						if (canSpawn (pos))
+								createZombie (pos);
+				}
 			
-		if(random.NextDouble() < 0.001){
+		if(random.NextDouble() < goldProbability){
 			Vector3 pos = generateRandomPosition();
 			if(canSpawn(pos))
 				createGold(pos);
 		}
 		
+		if(random.NextDouble() < scenarioElementProbability){
+			int randomNumber = random.Next(0, scenarioElements.Length);
+			Vector3 pos = generateRandomPosition();
+			pos.x = (scenarioElements[randomNumber] as GameObject).transform.position.x;
+			if(canSpawn(pos))
+				createCenarioElement(pos, randomNumber);
+		}
+		
 		removeUnnecessary(floorObjectsInGame);
 		removeUnnecessary(zombiesInGame);
 		removeUnnecessary(goldInGame);
+		removeUnnecessary(scenarioElementsInGame);
 	}
 
 	bool isBehindPlayer (GameObject o){
@@ -135,6 +151,20 @@ public class BarriersScript : MonoBehaviour {
 		goldObject.transform.position = goldPos;
 		
 		goldInGame.Add(goldObject);
+	}
+
+	void createCenarioElement (Vector3 pos, int randomNumber){
+		
+		
+		GameObject scenarioElement = GameObject.Instantiate(scenarioElements[randomNumber]) as GameObject;
+		
+		Vector3 floorObjectPos = scenarioElement.transform.position;
+
+		floorObjectPos.z = pos.z;
+		
+		scenarioElement.transform.position = floorObjectPos;
+		
+		scenarioElementsInGame.Add(scenarioElement);
 	}
 
 	Vector3 generateRandomPosition (){
