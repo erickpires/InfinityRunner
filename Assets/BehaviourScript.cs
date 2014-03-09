@@ -16,8 +16,6 @@ public class BehaviourScript : MonoBehaviour {
 	public float standingHeight;
 	public float crouchingHeight;
 	public float poisonedTime;
-	public float snowDrag;
-	public float waterDrag;
 	public float oilBoost;
 	public float goldBoost;
 	public Light lightSource;
@@ -200,12 +198,7 @@ public class BehaviourScript : MonoBehaviour {
 			UpdateGoldText();
 			goldText.text = "Ouro: " + gold;
 		}
-		
-		if(hit.gameObject.name.Contains("Water"))
-			speedVariation = -waterDrag;
-		
-		if(hit.gameObject.name.Contains("Snow"))
-			speedVariation = -snowDrag;
+
 		
 		if(hit.gameObject.name.Contains("Oil"))
 			speedVariation = oilBoost;
