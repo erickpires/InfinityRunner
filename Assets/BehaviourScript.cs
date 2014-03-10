@@ -16,8 +16,11 @@ public class BehaviourScript : MonoBehaviour {
 	public float standingHeight;
 	public float crouchingHeight;
 	public float poisonedTime;
+	public float snowDrag;
+	public float waterDrag;
 	public float oilBoost;
 	public float goldBoost;
+	public float poisonSpeedLoss;
 	public Light lightSource;
 	
 	public Vector3 standingCenter;
@@ -37,8 +40,10 @@ public class BehaviourScript : MonoBehaviour {
 	float distance;
 	float speedVariation;
 	float poisonTimeOut;
-	int gold;
+	float sideSpeedLoss;
 
+	int gold;
+	
 	// Use this for initialization
 	void Start () {
 		movementVelocity = Vector3.zero;
@@ -67,13 +72,20 @@ public class BehaviourScript : MonoBehaviour {
 			else
 				forwardSpeed = standingSpeed;
 			
-			movementVelocity = (transform.forward * Time.deltaTime * (forwardSpeed + speedVariation));
+			if(poisoned){
+				forwardSpeed -= poisonSpeedLoss;
+				sideSpeedLoss = sideSpeed/2;
+			}
+			else
+				sideSpeedLoss = 0;
+			
+			movementVelocity = (transform.forward.normalized * Time.deltaTime * (forwardSpeed + speedVariation));
 			
 			
 			//Input read section
 			if(Input.GetKey(KeyCode.LeftArrow) || state.ThumbSticks.Left.X == -1)
 				if(onGround)
-					movementVelocity += Vector3.left * sideSpeed;
+					movementVelocity += Vector3.left * (sideSpeed - sideSpeedLoss);
 			
 			if(Input.GetKey(KeyCode.RightArrow) || state.ThumbSticks.Left.X == 1)
 				if(onGround)
@@ -87,11 +99,11 @@ public class BehaviourScript : MonoBehaviour {
 				crouching = false;
 			
 			if (Input.GetKey (KeyCode.Space) || state.Buttons.A == ButtonState.Pressed)
-				if(!hasJumped) {
-					Debug.Log("jumped");
-					hasJumped = true;
-					onGround = false;
-					movementVelocity.y = Mathf.Sqrt(2 * jumpHeight * gravity);
+			if(!hasJumped) {
+				Debug.Log("jumped");
+				hasJumped = true;
+				onGround = false;
+				movementVelocity.y = Mathf.Sqrt(2 * jumpHeight * gravity);
 			}
 			
 			if(Input.GetKey(KeyCode.LeftShift) || state.Buttons.X == ButtonState.Pressed){
@@ -112,6 +124,7 @@ public class BehaviourScript : MonoBehaviour {
 			if(!canUseBoost && !Input.GetKey(KeyCode.LeftShift) && state.Buttons.X == ButtonState.Released)
 				canUseBoost = true;
 			
+			
 			if(crouching){
 				controller.height = crouchingHeight;
 				controller.center = crouchingCenter;
@@ -120,18 +133,11 @@ public class BehaviourScript : MonoBehaviour {
 				controller.height = standingHeight;
 				controller.center = standingCenter;
 			}
-			
-			
-			
-			
+				
 			if(poisoned){
 				poisonTimeOut -= Time.deltaTime;
 				if(poisonTimeOut <= 0){
-					poisoned = false;
-					poisonTimeOut = 0;
-					
-					lightSource.color = Color.white;
-					lightSource.intensity = 0.1f;
+					StopBeenPoisoned();
 				}
 			}
 			
@@ -164,7 +170,7 @@ public class BehaviourScript : MonoBehaviour {
 		movementVelocity.y -= gravity * Time.deltaTime;
 		
 	}
-
+	
 	void AdjustSpeedVariation (){
 		
 		if(speedVariation > 0)
@@ -189,16 +195,21 @@ public class BehaviourScript : MonoBehaviour {
 			Die();
 		}
 		
-		if(hit.gameObject.name == "Ground")
+		if(hit.gameObject.name.Contains("Ground"))
 			onGround = true;
-			
+		
 		if(hit.gameObject.name.Contains("Gold Ignot")){
 			gold++;
 			Destroy(hit.gameObject);
 			UpdateGoldText();
 			goldText.text = "Ouro: " + gold;
 		}
-
+		
+		if(hit.gameObject.name.Contains("Water"))
+			speedVariation = -waterDrag;
+		
+		if(hit.gameObject.name.Contains("Snow"))
+			speedVariation = -snowDrag;
 		
 		if(hit.gameObject.name.Contains("Oil"))
 			speedVariation = oilBoost;
@@ -207,17 +218,9 @@ public class BehaviourScript : MonoBehaviour {
 	void OnParticleCollision(GameObject other) {
 		Debug.Log("collided with " + other);
 		
-		if(!poisoned){
-			poisoned = true;
-			poisonTimeOut = poisonedTime;
-			
-			lightSource.color = Color.green;
-			lightSource.intensity = 8;
-			
-			Debug.Log("messege broadcasted");
-			
-			Messenger.Broadcast("player poisoned");
-		}
+		if(!poisoned)
+			GetPoisoned();
+		
 	}
 	
 	void Die (){
@@ -254,6 +257,36 @@ public class BehaviourScript : MonoBehaviour {
 		isAlive = false;
 	}
 	
+	void GetPoisoned (){
+		poisoned = true;
+		poisonTimeOut = poisonedTime;
+		
+		audio.enabled = true;		
+		foreach (AnimationState state in animation) {
+			state.speed = 0.5f;
+		}
+		
+		lightSource.color = Color.green;
+		lightSource.intensity = 8;
+		
+		Messenger.Broadcast("player poisoned");
+	}
+	
+	void StopBeenPoisoned (){	
+		poisoned = false;
+		poisonTimeOut = 0;
+		
+		audio.enabled = false;
+		foreach (AnimationState state in animation) {
+			state.speed = 1;
+		}
+		
+		lightSource.color = Color.white;
+		lightSource.intensity = 0.1f;
+		
+		Messenger.Broadcast("player not poisoned");
+	}
+	
 	void ShowGameOverText(float record, bool isNewRecord){
 		GameObject textObject = new GameObject("Game Over");
 		
@@ -279,7 +312,7 @@ public class BehaviourScript : MonoBehaviour {
 		textObject2.guiText.color = Color.grey;
 		textObject2.guiText.text = text;
 	}
-
+	
 	void UpdateGoldText (){
 		goldText.text = "Ouro: " + gold;
 	}

@@ -6,8 +6,8 @@ public class BarriersScript : MonoBehaviour {
 	public GameObject[] barriers;
 	public GameObject[] floorObjects;
 	public GameObject[] scenarioElements;
+	public GameObject[] zombies;
 	public GameObject player;
-	public GameObject zombie;
 	public GameObject gold;
 	public float minDistance;
 	public int maxBarriers;
@@ -136,7 +136,9 @@ public class BarriersScript : MonoBehaviour {
 	}
 
 	void createZombie (Vector3 pos){
-		GameObject zombieObject = GameObject.Instantiate(zombie) as GameObject;
+		int randomNumber = random.Next(0, floorObjects.Length);
+		
+		GameObject zombieObject = GameObject.Instantiate(zombies[randomNumber]) as GameObject;
 		
 		Vector3 zombiePos = zombieObject.transform.position;
 		

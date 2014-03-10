@@ -26,6 +26,8 @@ public class ZombieBehaviourScript : MonoBehaviour {
 		
 		
 		if(playerDirection.magnitude < idleDistance){
+			animation.Play("zombieWalk");
+		
 			rigidbody.velocity = playerDirection.normalized * speed;
 			transform.forward = playerDirection.normalized;
 			
@@ -34,8 +36,10 @@ public class ZombieBehaviourScript : MonoBehaviour {
 				audio.enabled = true;
 			}
 		}
-		else
+		else{
+			animation.Play("zombieIdle");
 			rigidbody.velocity = Vector3.zero;
+		}
 			
 		stopGoingUp();
 	}
