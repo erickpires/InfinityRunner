@@ -241,7 +241,6 @@ public class BehaviourScript : MonoBehaviour {
 		
 		if(distance > record){
 			Debug.Log("new Record");
-			record = distance;
 			newRecord = true;
 			System.IO.StreamWriter streamWriter = new System.IO.StreamWriter("record.dat");
 			
@@ -266,8 +265,7 @@ public class BehaviourScript : MonoBehaviour {
 			state.speed = 0.5f;
 		}
 		
-		lightSource.color = Color.green;
-		lightSource.intensity = 8;
+		lightSource.intensity = 8.0f;
 		
 		Messenger.Broadcast("player poisoned");
 	}
@@ -281,7 +279,6 @@ public class BehaviourScript : MonoBehaviour {
 			state.speed = 1;
 		}
 		
-		lightSource.color = Color.white;
 		lightSource.intensity = 0.1f;
 		
 		Messenger.Broadcast("player not poisoned");
@@ -294,23 +291,33 @@ public class BehaviourScript : MonoBehaviour {
 		textObject.AddComponent("GUIText");
 		textObject.guiText.fontSize = 70;
 		textObject.guiText.anchor = TextAnchor.MiddleCenter;
+		textObject.guiText.alignment = TextAlignment.Center;
 		textObject.guiText.color = Color.red;
-		textObject.guiText.text = "Game\n Over";
+		textObject.guiText.text = "Game\nOver";
 		
-		GameObject textObject2 = new GameObject("Score");
-		
-		string text = string.Format("Recorde atual: {0:0.0} m", record);
-		
-		if(isNewRecord)
-			text = "Novo Recorde\n" + text;
-		
+		GameObject textObject2 = new GameObject("Record");				
 		textObject2.transform.position = new Vector3(0.5f, 0, 0);
 		textObject2.AddComponent("GUIText");
 		textObject2.guiText.fontSize = 50;
 		textObject2.guiText.anchor = TextAnchor.LowerCenter;
 		textObject2.guiText.alignment = TextAlignment.Center;
 		textObject2.guiText.color = Color.grey;
-		textObject2.guiText.text = text;
+		
+		if(isNewRecord)
+			textObject2.guiText.text = "Novo Recorde\n" + string.Format("Recorde anterior:\n{0:0.0} m", record);
+		else
+			textObject2.guiText.text = string.Format("Recorde atual:\n{0:0.0} m", record);
+		
+		
+		GameObject textObject3 = new GameObject("Restart");
+		
+		textObject3.transform.position = new Vector3(0.98f, 0.02f, 0);
+		textObject3.AddComponent("GUIText");
+		textObject3.guiText.fontSize = 20;
+		textObject3.guiText.anchor = TextAnchor.LowerRight;
+		textObject3.guiText.alignment = TextAlignment.Center;
+		textObject3.guiText.color = Color.green;
+		textObject3.guiText.text = "Pressione [Enter]\nou (Y)\npara reiniciar";
 	}
 	
 	void UpdateGoldText (){
