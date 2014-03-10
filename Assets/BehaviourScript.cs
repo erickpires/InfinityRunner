@@ -86,7 +86,7 @@ public class BehaviourScript : MonoBehaviour {
 			if(Input.GetKey(KeyCode.LeftArrow) || state.ThumbSticks.Left.X == -1)
 				if(onGround)
 					movementVelocity += Vector3.left * (sideSpeed - sideSpeedLoss);
-			
+						
 			if(Input.GetKey(KeyCode.RightArrow) || state.ThumbSticks.Left.X == 1)
 				if(onGround)
 					movementVelocity += Vector3.right * sideSpeed;
